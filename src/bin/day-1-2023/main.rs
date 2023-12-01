@@ -1,4 +1,37 @@
-use std::{collections::HashMap, fs};
+use std::fs;
+
+
+// Using array insted of hashmap due to small n
+const DIGITS: &[(&[u8], u8)] = &[
+    ("1".as_bytes(), 1),
+    ("2".as_bytes(), 2),
+    ("3".as_bytes(), 3),
+    ("4".as_bytes(), 4),
+    ("5".as_bytes(), 5),
+    ("6".as_bytes(), 6),
+    ("7".as_bytes(), 7),
+    ("8".as_bytes(), 8),
+    ("9".as_bytes(), 9),
+    ("one".as_bytes(), 1),
+    ("two".as_bytes(), 2),
+    ("three".as_bytes(), 3),
+    ("four".as_bytes(), 4),
+    ("five".as_bytes(), 5),
+    ("six".as_bytes(), 6),
+    ("seven".as_bytes(), 7),
+    ("eight".as_bytes(), 8),
+    ("nine".as_bytes(), 9),
+];
+
+fn get_digit(k: &[u8], table: &[(&[u8], u8)]) -> Option<u8> {
+    // linear serach
+    for (key, value) in table {
+        if key == &k {
+            return Some(value).copied();
+        }
+    }
+    None
+}
 
 fn print_byte_arr(x: &[u8]) {
     for c in x {
@@ -7,33 +40,37 @@ fn print_byte_arr(x: &[u8]) {
     println!("");
 }
 
-fn is_digit(line: &[u8], digits: &HashMap<&[u8], u8>) -> Option<u8> {
+fn is_digit(line: &[u8]) -> Option<u8> {
     // Expanding window matched to a map
     for i in 0..line.len() {
         let window = &line[i..line.len()];
         // print_byte_arr(window);
-        if digits.contains_key(window) {
-            return digits.get(window).copied();
+        let lookup = get_digit(window, DIGITS);
+        match lookup {
+            Some(x) => return Some(x),
+            None => ()
         }
     }
 
     return None;
 }
 
-fn is_digit_reversed(line: &[u8], digits: &HashMap<&[u8], u8>) -> Option<u8> {
+fn is_digit_reversed(line: &[u8]) -> Option<u8> {
     // Expanding window matched to a map
     for i in 0..line.len() {
         let window = &line[0..line.len()-i];
         // print_byte_arr(window);
-        if digits.contains_key(window) {
-            return digits.get(window).copied();
+        let lookup = get_digit(window, DIGITS);
+        match lookup {
+            Some(x) => return Some(x),
+            None => ()
         }
     }
 
     return None;
 }
 
-fn find_all_digits(line: &str, digits: &HashMap<&[u8], u8>) -> (u8, u8) {
+fn find_all_digits(line: &str) -> (u8, u8) {
     // Two pointers algorithm
     // Increment two pointers from left and right to find the first numbers
 
@@ -48,8 +85,8 @@ fn find_all_digits(line: &str, digits: &HashMap<&[u8], u8>) -> (u8, u8) {
         let l_char = &line.as_bytes()[0..l_ptr];
         let r_char = &line.as_bytes()[r_ptr..line_len];
 
-        l_digit = is_digit(l_char, digits);
-        r_digit = is_digit_reversed(r_char, digits);
+        l_digit = is_digit(l_char);
+        r_digit = is_digit_reversed(r_char);
 
         if !l_digit.is_some() {
             l_ptr += 1;
@@ -105,29 +142,8 @@ fn solve_pt_2(input: &String) -> u32 {
     let lines = input.lines();
     let mut sum = 0;
 
-    let digits = HashMap::from([
-        ("1".as_bytes(), 1),
-        ("2".as_bytes(), 2),
-        ("3".as_bytes(), 3),
-        ("4".as_bytes(), 4),
-        ("5".as_bytes(), 5),
-        ("6".as_bytes(), 6),
-        ("7".as_bytes(), 7),
-        ("8".as_bytes(), 8),
-        ("9".as_bytes(), 9),
-        ("one".as_bytes(), 1),
-        ("two".as_bytes(), 2),
-        ("three".as_bytes(), 3),
-        ("four".as_bytes(), 4),
-        ("five".as_bytes(), 5),
-        ("six".as_bytes(), 6),
-        ("seven".as_bytes(), 7),
-        ("eight".as_bytes(), 8),
-        ("nine".as_bytes(), 9),
-    ]);
-
     for line in lines {
-        let digits = find_all_digits(line, &digits);
+        let digits = find_all_digits(line);
         sum += (digits.0 * 10) as u32 + digits.1 as u32;
     }
 
@@ -170,10 +186,14 @@ zoneight234
 
     assert_eq!(solve_pt_1(&test_input_1), test_output_1);
     assert_eq!(solve_pt_2(&test_input_2), test_output_2);
-
+    
     let part_1 = solve_pt_1(&input);
+    let part_2 = solve_pt_2(&input);
+
+    assert_eq!(part_1, 55090);
+    assert_eq!(part_2, 54845);
+
     println!("{part_1}");
 
-    let part_2 = solve_pt_2(&input);
     println!("{part_2}");
 }
