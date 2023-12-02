@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, time::Instant};
 
 
 // Using array insted of hashmap due to small n
@@ -187,8 +187,12 @@ zoneight234
     assert_eq!(solve_pt_1(&test_input_1), test_output_1);
     assert_eq!(solve_pt_2(&test_input_2), test_output_2);
     
+    let timer = Instant::now();
+
     let part_1 = solve_pt_1(&input);
     let part_2 = solve_pt_2(&input);
+
+    println!("{:?}", timer.elapsed());
 
     assert_eq!(part_1, 55090);
     assert_eq!(part_2, 54845);
